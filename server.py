@@ -475,3 +475,5 @@ async def main():
     # On écoute sur 0.0.0.0 (toutes les interfaces) au lieu de 127.0.0.1
     async with websockets.serve(mission_control_hub, "0.0.0.0", port):
         await asyncio.Future()
+if __name__ == "__main__":
+    asyncio.run(main())
