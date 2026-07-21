@@ -1,0 +1,91 @@
+{
+    "board_state": {
+        "task_counter": 0,
+        "tasks": []
+    },
+    "chat_history": [
+        {
+            "type": "chat",
+            "username": "[Lv.1 Novice] SKWIZI",
+            "color": "#ff3366",
+            "value": "ahhhhh"
+        },
+        {
+            "type": "chat",
+            "username": "[Lv.1 Novice] SKWIZI",
+            "color": "#ff3366",
+            "value": "enfin"
+        },
+        {
+            "type": "chat",
+            "username": "[Lv.1 Novice] WINO",
+            "color": "#ffcc00",
+            "value": "d"
+        },
+        {
+            "type": "chat",
+            "username": "NEXUS_BOT",
+            "color": "#ff00ff",
+            "value": "Simplification de a&b : a & b"
+        },
+        {
+            "type": "chat",
+            "username": "NEXUS_BOT",
+            "color": "#ff00ff",
+            "value": "Simplification de 1+1 : 2"
+        },
+        {
+            "type": "chat",
+            "username": "SYSTÈME",
+            "color": "#ffaa00",
+            "value": "SÉQUENCE COMPLÈTE : L'équipe a validé toutes les tâches de l'Intel Board !"
+        },
+        {
+            "type": "chat",
+            "username": "SYSTÈME",
+            "color": "#ffaa00",
+            "value": "RAPPORT DE SESSION\nInterrompue après 06m 19s."
+        },
+        {
+            "type": "chat",
+            "username": "SYSTÈME",
+            "color": "#ff0055",
+            "value": "Le tableau a été purgé."
+        },
+        {
+            "type": "chat",
+            "username": "SYSTÈME",
+            "color": "#ffaa00",
+            "value": "NOUVEAU SONDAGE PAR SKWIZI\n[bold orange]► Qui est le goat?[/]\n[bold #ffaa00]/vote 1[/] - Crazy fazbear   | [bold #00e5ff]░░░░░░░░░░[/] 0% (0)\n[bold #ffaa00]/vote 2[/] - Frederic Mabilat | [bold #00e5ff]░░░░░░░░░░[/] 0% (0)"
+        },
+        {
+            "type": "chat",
+            "username": "SYSTÈME",
+            "color": "#ffaa00",
+            "value": "NOUVEAU SONDAGE PAR SKWIZI\n[bold orange]► ar?[/]\n[bold #ffaa00]/vote 1[/] - R1              | [bold #00e5ff]░░░░░░░░░░[/] 0% (0)\n[bold #ffaa00]/vote 2[/] - R2              | [bold #00e5ff]░░░░░░░░░░[/] 0% (0)\n[bold #ffaa00]/vote 3[/] - R3              | [bold #00e5ff]░░░░░░░░░░[/] 0% (0)"
+        },
+        {
+            "type": "chat",
+            "username": "SYSTÈME",
+            "color": "#ffaa00",
+            "value": "MISE À JOUR DU SONDAGE :\n[bold orange]► ar?[/]\n[bold #ffaa00]/vote 1[/] - R1              | [bold #00e5ff]██████████[/] 100% (1)\n[bold #ffaa00]/vote 2[/] - R2              | [bold #00e5ff]░░░░░░░░░░[/] 0% (0)\n[bold #ffaa00]/vote 3[/] - R3              | [bold #00e5ff]░░░░░░░░░░[/] 0% (0)"
+        }
+    ],
+    "user_profiles": {
+        "SKWIZI": {
+            "exp": 30,
+            "level": 1,
+            "default_color": "#ff3366",
+            "color": "#ff3366",
+            "rank": "Novice"
+        },
+        "WINO": {
+            "exp": 0,
+            "level": 1,
+            "default_color": "#ffcc00",
+            "color": "#ffcc00",
+            "rank": "Novice"
+        }
+    },
+    "dead_drops": {}
+}
