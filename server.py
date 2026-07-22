@@ -6,6 +6,7 @@ import sympy
 import shlex
 import hashlib
 import time
+import pymongo
 from sympy.parsing.sympy_parser import parse_expr, standard_transformations, implicit_multiplication_application
 
 connected_clients = {}
@@ -88,37 +89,52 @@ def check_board_combo():
     if not board_state["tasks"]: return False
     return all(task["done"] for task in board_state["tasks"])
 
+# --- CONNEXION À LA BASE DE DONNÉES CLOUD ---
+MONGO_URI = "mongodb+srv://evanncarpentier1o_db_user:4zmURuJMR7UlaoXB@nexus.zfdr6g6.mongodb.net/?appName=Nexus"
+
+try:
+    mongo_client = pymongo.MongoClient(MONGO_URI)
+    db = mongo_client["nexus_database"]
+    collection = db["server_state"]
+except Exception as e:
+    print("CRITIQUE : Impossible de joindre MongoDB", e)
+
 def save_state():
+    """Sauvegarde le JSON en écrasant l'ancienne version dans le cloud."""
     try:
-        with open(STATE_FILE, "w", encoding="utf-8") as f:
-            json.dump({
-                "board_state": board_state,
-                "chat_history": chat_history,
-                "user_profiles": user_profiles,
-                "dead_drops": dead_drops,
-                "last_chat_purge": last_chat_purge
-            }, f, ensure_ascii=False, indent=4)
-    except Exception:
-        pass
+        state_data = {
+            "_id": "master_state", # Cet ID unique garantit qu'on modifie toujours le même fichier
+            "board_state": board_state,
+            "chat_history": chat_history,
+            "user_profiles": user_profiles,
+            "dead_drops": dead_drops,
+            "last_chat_purge": last_chat_purge
+        }
+        # replace_one va remplacer le document existant, ou le créer s'il n'y en a pas
+        collection.replace_one({"_id": "master_state"}, state_data, upsert=True)
+    except Exception as e:
+        print(f"Erreur de sauvegarde cloud : {e}")
 
 def load_state():
-    global board_state, chat_history, user_profiles, dead_drops
-    if os.path.exists(STATE_FILE):
-        try:
-            with open(STATE_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                board_state = data.get("board_state", board_state)
-                chat_history = data.get("chat_history", [])
-                user_profiles = data.get("user_profiles", {})
-                dead_drops = data.get("dead_drops", {})
-                last_chat_purge = data.get("last_chat_purge", time.time())
-                
-                # Migration : S'assurer que chaque profil existant a sa couleur unique
-                for uname, prof in user_profiles.items():
-                    if "default_color" not in prof:
-                        prof["default_color"] = get_user_default_color(uname)
-        except Exception:
-            pass
+    """Récupère le JSON depuis le cloud au démarrage du serveur."""
+    global board_state, chat_history, user_profiles, dead_drops, last_chat_purge
+    
+    try:
+        # On fouille la base de données pour trouver notre sauvegarde
+        data = collection.find_one({"_id": "master_state"})
+        
+        if data:
+            board_state = data.get("board_state", board_state)
+            chat_history = data.get("chat_history", [])
+            user_profiles = data.get("user_profiles", {})
+            dead_drops = data.get("dead_drops", {})
+            last_chat_purge = data.get("last_chat_purge", time.time())
+            print(">>> ARCHIVES CLOUD RÉCUPÉRÉES AVEC SUCCÈS <<<")
+        else:
+            print(">>> AUCUNE ARCHIVE TROUVÉE. INITIALISATION À ZÉRO. <<<")
+            
+    except Exception as e:
+        print(f"Erreur de chargement cloud : {e}")
 
 def append_to_history(msg_dict):
     chat_history.append(msg_dict)
