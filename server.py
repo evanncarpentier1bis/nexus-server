@@ -90,8 +90,12 @@ def check_board_combo():
     return all(task["done"] for task in board_state["tasks"])
 
 # --- CONNEXION À LA BASE DE DONNÉES CLOUD ---
-MONGO_URI = "mongodb+srv://evanncarpentier1o_db_user:4zmURuJMR7UlaoXB@nexus.zfdr6g6.mongodb.net/?appName=Nexus"
+# Au lieu de l'URL en clair, on demande à Render de fournir la clé secrète
+MONGO_URI = os.environ.get("MONGO_URI")
 
+# Si on teste en local et que la variable n'existe pas, on prévoit une sécurité
+if not MONGO_URI:
+    print("ATTENTION : Clé MongoDB introuvable.")
 try:
     mongo_client = pymongo.MongoClient(MONGO_URI)
     db = mongo_client["nexus_database"]
