@@ -1,4 +1,3 @@
-import http
 import asyncio
 import websockets
 import json
@@ -9,6 +8,8 @@ import hashlib
 import time
 import pymongo
 from sympy.parsing.sympy_parser import parse_expr, standard_transformations, implicit_multiplication_application
+from websockets.http11 import Response
+from websockets.datastructures import Headers
 
 connected_clients = {}
 
@@ -490,16 +491,13 @@ async def main():
     load_state()
     asyncio.create_task(global_timer())
 
-    # Render impose son propre port via les variables d'environnement
     port = int(os.environ.get("PORT", 8765))
 
-
-    import http
-
+    # --- DÉBUT DE LA FONCTION DE VÉRIFICATION ---
     async def health_check(*args, **kwargs):
         try:
             is_websocket = False
-        
+            
             for arg in args:
                 if hasattr(arg, "headers"):  
                     if "websocket" in str(arg.headers.get("Upgrade", "")).lower():
@@ -507,23 +505,23 @@ async def main():
                 elif isinstance(arg, dict):  
                     if "websocket" in str(arg.get("Upgrade", "")).lower():
                         is_websocket = True
-                    
+                        
             if not is_websocket:
-                # La réponse HTTP parfaite avec sa taille exacte
                 message = b"OK"
-                headers = [
+                headers = Headers([
                     ("Content-Type", "text/plain"),
-                    ("Content-Length", str(len(message)))  # <-- La clé de la réussite
-                ]
-                return http.HTTPStatus.OK, headers, message
-            
+                    ("Content-Length", str(len(message)))
+                ])
+                return Response(200, "OK", headers, message)
+                
         except Exception:
-            # On ignore silencieusement les requêtes étranges
             pass
-        
-        return None
+            
+        # Ce return reste DANS le health_check
+        return None  
+    # --- FIN DE LA FONCTION DE VÉRIFICATION ---
 
-      # On écoute sur 0.0.0.0 (toutes les interfaces) au lieu de 127.0.0.1
+    # --- DÉMARRAGE DU SERVEUR ---
     async with websockets.serve(mission_control_hub, "0.0.0.0", port, process_request=health_check):
         await asyncio.Future()
 
