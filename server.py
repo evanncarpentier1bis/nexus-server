@@ -494,33 +494,36 @@ async def main():
     port = int(os.environ.get("PORT", 8765))
 
 
+    import http
+
     async def health_check(*args, **kwargs):
         try:
             is_websocket = False
         
-            # On fouille dans les arguments fournis par la librairie, peu importe sa version
             for arg in args:
-                # Si on détecte la nouvelle version
                 if hasattr(arg, "headers"):  
                     if "websocket" in str(arg.headers.get("Upgrade", "")).lower():
                         is_websocket = True
-                # Si on détecte l'ancienne version
                 elif isinstance(arg, dict):  
                     if "websocket" in str(arg.get("Upgrade", "")).lower():
                         is_websocket = True
                     
-            # Si la requête n'est PAS un tunnel WebSocket (c'est donc UptimeRobot)
             if not is_websocket:
-                # On force une réponse HTTP 200 OK limpide
-                return http.HTTPStatus.OK, [], b""
+                # La réponse HTTP parfaite avec sa taille exacte
+                message = b"OK"
+                headers = [
+                    ("Content-Type", "text/plain"),
+                    ("Content-Length", str(len(message)))  # <-- La clé de la réussite
+                ]
+                return http.HTTPStatus.OK, headers, message
             
-        except Exception as e:
-            print(f"Erreur silencieuse ignorée : {e}")
+        except Exception:
+            # On ignore silencieusement les requêtes étranges
+            pass
         
-        # On laisse passer les connexions légitimes
         return None
 
-    # On écoute sur 0.0.0.0 (toutes les interfaces) au lieu de 127.0.0.1
+      # On écoute sur 0.0.0.0 (toutes les interfaces) au lieu de 127.0.0.1
     async with websockets.serve(mission_control_hub, "0.0.0.0", port, process_request=health_check):
         await asyncio.Future()
 
