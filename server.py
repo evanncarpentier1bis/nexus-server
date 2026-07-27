@@ -512,7 +512,7 @@ async def main():
             # Si la requête n'est PAS un tunnel WebSocket (c'est donc UptimeRobot)
             if not is_websocket:
                 # On force une réponse HTTP 200 OK limpide
-                return http.HTTPStatus.OK, [("Content-Type", "text/plain")], b"Serveur Nexus Actif\n"
+                return http.HTTPStatus.OK, [], b""
             
         except Exception as e:
             print(f"Erreur silencieuse ignorée : {e}")
