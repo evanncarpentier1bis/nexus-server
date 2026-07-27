@@ -1,3 +1,4 @@
+import http
 import asyncio
 import websockets
 import json
@@ -488,12 +489,21 @@ async def main():
     print("=== SERVEUR NEXUS INITIALISÉ ===")
     load_state()
     asyncio.create_task(global_timer())
-    
+
     # Render impose son propre port via les variables d'environnement
     port = int(os.environ.get("PORT", 8765))
-    
+
+    async def health_check(path, request_headers):
+        # Si UptimeRobot (ou un navigateur) frappe à la racine du site
+        if path == "/":
+            return http.HTTPStatus.OK, [], b"Serveur Nexus Actif\n"
+        
+        # Pour toutes les autres requêtes, on laisse passer le WebSocket
+        return None
+
     # On écoute sur 0.0.0.0 (toutes les interfaces) au lieu de 127.0.0.1
-    async with websockets.serve(mission_control_hub, "0.0.0.0", port):
+    async with websockets.serve(mission_control_hub, "0.0.0.0", port, process_request=health_check):
         await asyncio.Future()
+
 if __name__ == "__main__":
     asyncio.run(main())
