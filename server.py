@@ -493,12 +493,31 @@ async def main():
     # Render impose son propre port via les variables d'environnement
     port = int(os.environ.get("PORT", 8765))
 
-    async def health_check(path, request_headers):
-        # Si UptimeRobot (ou un navigateur) frappe à la racine du site
-        if path == "/":
-            return http.HTTPStatus.OK, [], b"Serveur Nexus Actif\n"
+
+    async def health_check(*args, **kwargs):
+        try:
+            is_websocket = False
         
-        # Pour toutes les autres requêtes, on laisse passer le WebSocket
+            # On fouille dans les arguments fournis par la librairie, peu importe sa version
+            for arg in args:
+                # Si on détecte la nouvelle version
+                if hasattr(arg, "headers"):  
+                    if "websocket" in str(arg.headers.get("Upgrade", "")).lower():
+                        is_websocket = True
+                # Si on détecte l'ancienne version
+                elif isinstance(arg, dict):  
+                    if "websocket" in str(arg.get("Upgrade", "")).lower():
+                        is_websocket = True
+                    
+            # Si la requête n'est PAS un tunnel WebSocket (c'est donc UptimeRobot)
+            if not is_websocket:
+                # On force une réponse HTTP 200 OK limpide
+                return http.HTTPStatus.OK, [("Content-Type", "text/plain")], b"Serveur Nexus Actif\n"
+            
+        except Exception as e:
+            print(f"Erreur silencieuse ignorée : {e}")
+        
+        # On laisse passer les connexions légitimes
         return None
 
     # On écoute sur 0.0.0.0 (toutes les interfaces) au lieu de 127.0.0.1
